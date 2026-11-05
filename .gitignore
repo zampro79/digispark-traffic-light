@@ -1,0 +1,22 @@
+# Arduino and PlatformIO build output
+build/
+.build/
+.pio/
+*.a
+*.bin
+*.d
+*.eep
+*.elf
+*.hex
+*.lst
+*.map
+*.o
+
+# Editor and operating-system temporary files
+*~
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
