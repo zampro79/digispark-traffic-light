@@ -10,7 +10,7 @@ folder. Version 1.03 is the recommended revision.
 ## Project Background
 
 This little traffic-light project was originally built during the COVID-19
-pandemic as a playful electronics gadget for my child.
+pandemic as a playful electronics gadget for my son.
 
 Years later, I revisited the original Digispark firmware, fixed a few issues,
 added visual diagnostics and power-saving features, and improved the
@@ -26,18 +26,22 @@ documentation so others could build and enjoy it too.
 
 ## Hardware and pins
 
-The current wiring is:
+The confirmed firmware 1.03 setup is powered from USB at 5 V. The three
+external LEDs are driven directly by the GPIO pins without transistors. Each
+external LED has its own 330 ohm current-limiting resistor and shares the board
+ground.
 
-| Digispark pin | Function |
-| --- | --- |
-| P0 | External green LED |
-| P1 | Onboard diagnostic LED |
-| P2 | External yellow LED |
-| P4 | External red LED |
+| Digispark pin | Function | Series resistor |
+| --- | --- | ---: |
+| P0 | External green LED | 330 ohm |
+| P1 | Onboard diagnostic LED | Onboard circuit |
+| P2 | External yellow LED | 330 ohm |
+| P4 | External red LED | 330 ohm |
 
-Each external LED requires a current-limiting resistor. Firmware 1.00 and 1.01
-instead use P1 for the external yellow LED and have no independent diagnostic
-LED. See [Hardware](docs/hardware.md) before wiring the board.
+The external LED models and actual currents have not been documented or
+measured. Firmware 1.00 and 1.01 instead use P1 for the external yellow LED and
+have no independent diagnostic LED. See [Hardware](docs/hardware.md) before
+wiring the board.
 
 ## Operating sequence
 
@@ -113,8 +117,8 @@ workflow are documented in [Installation](docs/installation.md). Consult
   active HIGH and the firmware exposes a polarity constant.
 - Power-down reduces ATtiny85 activity, not the current drawn by the complete
   board's regulator, power LED, USB network, or clone-specific components.
-- Battery chemistry, voltage, current capability, and protection are not
-  specified by this project.
+- The tested setup uses USB power at 5 V. Battery operation, chemistry, voltage,
+  current capability, and protection are not specified or verified.
 
 ## Documentation
 

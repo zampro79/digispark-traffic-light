@@ -11,15 +11,27 @@ host compatibility before depending on it on a new operating-system release.
 - A compatible Digistump AVR Boards package that supplies the Digispark board
   definition and Micronucleus uploader.
 - A data-capable USB connection.
-- One sketch opened from its matching folder, for example
+- A local clone of this repository, with one sketch opened from its matching
+  folder, for example
   `firmware/traffic_light_1_03/traffic_light_1_03.ino`.
 
-Select the Digispark ATtiny85 board, the project's tested **16.5 MHz** clock
-configuration, and the Micronucleus variant already present on the board. The
-locally tested Arduino FQBN is `digistump:avr:digispark-tiny`. Menu wording
-varies between core releases. The 16.5 MHz setting documents the configuration
-used to build and test this firmware; it is not a universal requirement
-imposed by the Micronucleus bootloader on every Digispark application.
+Firmware 1.03 was confirmed on physical hardware with the Arduino IDE clock
+option set to **16.5 MHz - For V-USB**. This is the confirmed configuration for
+the successful hardware test. It is not a universal requirement imposed by the
+Micronucleus bootloader on every Digispark application.
+
+The full reference FQBN exposed by the currently installed tools is:
+
+```text
+digistump:avr:digispark-tiny:clock=clock165,micronucleus=default,burnmode=upgrade
+```
+
+The board and `clock165` selection match the confirmed hardware test. The
+`micronucleus=default` and `burnmode=upgrade` options were detected in the
+current local environment, but have not been independently confirmed as the
+complete historical configuration used for that test. Menu names and available
+options may vary between core releases. Do not change or replace the bootloader
+solely to reproduce these menu selections.
 
 The maintained Digistump package index is published by the ArminJo
 DigistumpArduino project, but that project labels the core deprecated and
@@ -34,20 +46,83 @@ Manager URLs setting:
 https://raw.githubusercontent.com/ArminJo/DigistumpArduino/master/package_digistump_index.json
 ```
 
+## Current local environment and historical scope
+
+The following environment was observed on the current Fedora Linux 44 x86-64
+computer during a read-only inventory:
+
+| Component | Currently installed version |
+| --- | --- |
+| Arduino IDE | 2.3.10 |
+| Arduino CLI bundled with the IDE | 1.5.1 |
+| Digistump AVR Boards | 1.7.5 |
+| Board identifier | `digistump:avr:digispark-tiny` |
+| Micronucleus package | 2.6 |
+| Micronucleus executable self-reported version | 2.5 |
+
+The Micronucleus package directory and package metadata identify version 2.6,
+while the installed executable reports `micronucleus-cli` 2.5. Both values are
+recorded rather than treating either one as the unambiguous uploader version.
+The bootloader version installed on the physical Digispark has not been
+identified.
+
+These are the tools installed at the time of the inventory. They must not be
+assumed to be the exact historical tool versions used for the successful 1.03
+build and upload. The confirmed historical facts are the Digispark ATtiny85
+target, the 16.5 MHz - For V-USB clock selection, a successful Arduino IDE and
+Micronucleus upload, and successful operation on the physical hardware. Exact
+historical Arduino IDE, core, CLI, uploader, and bootloader versions remain
+unverified.
+
 ## Compile and upload with Arduino IDE
 
-1. Open the desired `.ino` file directly; each sketch folder contains one main
-   file with the same base name as the folder.
-2. Select the Digispark target and the tested 16.5 MHz clock configuration.
-3. Use **Sketch > Verify/Compile** to build without touching the board.
-4. For upload, disconnect battery power and unplug the Digispark from USB.
-5. Start **Upload** and connect the Digispark only when Micronucleus asks for
+1. Clone or download this repository, then keep its directory structure intact.
+2. In Arduino IDE, open
+   `firmware/traffic_light_1_03/traffic_light_1_03.ino` from the local clone.
+   Each sketch folder contains one main file with the same base name as the
+   folder.
+3. Select the Digispark ATtiny85 target and **16.5 MHz - For V-USB**, the clock
+   configuration confirmed by the firmware 1.03 hardware test.
+4. Leave the Micronucleus variant and bootloader method consistent with the
+   bootloader already present on the board. The current environment displays
+   `Default` and `Upgrade (via USB)`, but these two selections are not recorded
+   as confirmed historical requirements.
+5. Use **Sketch > Verify/Compile** to build without touching the board.
+6. For upload, disconnect battery power and unplug the Digispark from USB.
+7. Start **Upload** and connect the Digispark only when Micronucleus asks for
    it. Its short bootloader window starts at power-up.
-6. Treat the uploader's successful completion message as upload confirmation;
+8. Treat the uploader's successful completion message as upload confirmation;
    then perform the functional checks in [Firmware](firmware.md).
 
 Do not power the board from USB and an undocumented battery path at the same
 time. This project does not require fuse changes or bootloader replacement.
+
+## Verified Arduino build
+
+Firmware 1.03 was compiled successfully without upload on Fedora Linux 44
+x86-64 using the following installed environment:
+
+| Component | Verified build value |
+| --- | --- |
+| Arduino IDE AppImage | 2.3.10 |
+| Bundled Arduino CLI | 1.5.1 |
+| Digistump AVR Boards | 1.7.5 |
+| AVR compiler | avr-g++ GCC 7.3.0-atmel3.6.1-arduino7 |
+| MCU | ATtiny85 |
+| CPU frequency | `F_CPU=16500000L` |
+| Requested FQBN | `digistump:avr:digispark-tiny:clock=clock165,micronucleus=default,burnmode=upgrade` |
+| Flash | 1,156 / 6,650 bytes (about 17%) |
+| Global RAM | 9 / 512 bytes (about 1.8%) |
+
+The bundled CLI was extracted temporarily from the Arduino IDE AppImage, with
+no additional package installation. All build artifacts were generated outside
+the repository. This was a compile-only verification: it did not upload the
+firmware, repeat the hardware test, or verify the procedure from a completely
+clean clone.
+
+The 6,650-byte flash limit above comes from the Arduino build with the current
+`micronucleus=default` board option. It is distinct from the historical
+PlatformIO result below, which used a 6,012-byte flash limit.
 
 ## Linux
 
@@ -69,6 +144,9 @@ missing host libraries required by the packaged uploader.
 ### Fedora notes
 
 The project's Arduino IDE workflow has been exercised on Fedora Linux.
+The current read-only environment inventory was performed on Fedora Linux 44
+x86-64, but this does not establish the Fedora release used for the historical
+firmware 1.03 hardware test.
 The Arduino AppImage may need Fedora's FUSE compatibility package. Package
 names and policy change by Fedora release, so follow current Fedora and Arduino
 documentation rather than copying a command intended for another distribution.
@@ -111,29 +189,30 @@ macOS versions is unverified for this project.
 ## Optional PlatformIO workflow
 
 PlatformIO Core with the Atmel AVR platform recognizes the board ID
-`digispark-tiny`. In an existing PlatformIO project configured for this
-repository, the verified build command was:
+`digispark-tiny`. A historical local verification used an existing, separately
+configured PlatformIO project and the following command:
 
 ```sh
 pio run -e digispark-tiny
 ```
 
 The successful local verification used ATtiny85, Digistump framework 1.7.2,
-and `F_CPU=16500000L`. No `platformio.ini` is stored in this repository, so the
-following is illustrative and must be reviewed before use:
+and `F_CPU=16500000L`. It produced a firmware size of 1,156 of 6,012 flash bytes
+and 9 of 512 RAM bytes.
 
-```ini
-[env:digispark-tiny]
-platform = atmelavr
-board = digispark-tiny
-framework = arduino
-board_build.f_cpu = 16500000L
-```
+No `platformio.ini` or PlatformIO source-layout configuration is stored in this
+repository. Consequently, `pio run -e digispark-tiny` is a record of the
+historical verification, not a command that can be run directly from a clean
+clone. Reproducing this workflow requires a reviewed project configuration that
+selects `firmware/traffic_light_1_03` as its source, pins the intended platform
+and framework versions, and explicitly sets `F_CPU=16500000L`. Such a
+configuration must be tested from a clean clone before it is documented as a
+supported procedure.
 
 PlatformIO's published board page reports `digispark-tiny` but may show a
 different default frequency. Explicitly inspect the effective build flags; do
-not infer 16.5 MHz solely from the board ID. The local 1.03 build used 1,156 of
-6,012 flash bytes and 9 of 512 RAM bytes.
+not infer 16.5 MHz solely from the board ID. Do not infer successful upload or
+hardware compatibility from a successful PlatformIO compilation alone.
 
 ## Sources and compatibility scope
 

@@ -9,19 +9,41 @@ revision and verify its schematic before relying on board-level details.
 This is a hobby electronics gadget for education and experimentation. It is
 not suitable for real traffic control or any safety-critical application.
 
-## Current wiring (firmware 1.02 and 1.03)
+## Verified wiring (firmware 1.03)
 
-| Pin | Connection | Active state |
-| --- | --- | --- |
-| P0 | External green LED | `HIGH` |
-| P1 | Onboard diagnostic LED | Configurable; `HIGH` on the tested board |
-| P2 | External yellow LED | `HIGH` |
-| P4 | External red LED | `HIGH` |
+The confirmed hardware setup is powered from USB at 5 V. The three external
+LEDs are driven directly by the ATtiny85 GPIO pins without transistors. Each
+external LED has its own 330 ohm current-limiting resistor and shares the board
+ground.
 
-Connect every external LED through a suitable current-limiting resistor and
-use a common ground. The repository does not specify resistor values because
-LED characteristics, supply voltage, and board wiring have not been fully
-documented.
+| Pin | Connection | Series resistor | Active state |
+| --- | --- | ---: | --- |
+| P0 | External green LED | 330 ohm | `HIGH` |
+| P1 | Onboard diagnostic LED | Onboard circuit | Configurable; `HIGH` on the tested board |
+| P2 | External yellow LED | 330 ohm | `HIGH` |
+| P4 | External red LED | 330 ohm | `HIGH` |
+
+### Wiring diagram
+
+The confirmed firmware 1.03 wiring uses a common ground for the Digispark and
+all three external LEDs:
+
+```text
+USB 5 V  --->  Digispark power
+
+P0  --->  [330 ohm]  --->  anode   GREEN LED   cathode  ---+
+P2  --->  [330 ohm]  --->  anode   YELLOW LED  cathode  ---+--> GND
+P4  --->  [330 ohm]  --->  anode   RED LED     cathode  ---+
+
+P1  --->  onboard diagnostic LED
+```
+
+The external LEDs are driven directly by the GPIO pins; no transistors are
+used. The GND shown above is the Digispark ground and the USB supply ground.
+
+The exact external LED models and resulting currents have not been measured or
+documented. Do not assume that this confirmed resistor value is suitable for a
+different supply voltage, LED type, board revision, or circuit.
 
 Do not exceed either the per-pin output-current limits or the total GPIO and
 device current limits. Consult the ATtiny85 datasheet and the schematic for the
@@ -34,11 +56,13 @@ diagnostic LED.
 ## Hardware validation of firmware 1.03
 
 The author compiled 1.03 with Arduino IDE and uploaded it successfully through
-Micronucleus. Testing on the physical Digispark confirmed ten normal cycles,
-the one/two/three-pulse diagnostic patterns, ten final yellow flashes, and all
+Micronucleus. The physical test used the USB-powered 5 V setup described above,
+with three directly driven external LEDs and one dedicated 330 ohm resistor per
+LED. Testing on the physical Digispark confirmed ten normal cycles, the
+one/two/three-pulse diagnostic patterns, ten final yellow flashes, and all
 controlled LEDs switching off. No spontaneous restart was observed. Reset and
-power cycling restarted the complete sequence, and a subsequent firmware
-upload remained possible.
+power cycling restarted the complete sequence, and a subsequent firmware upload
+remained possible.
 
 Actual current consumption and the nominal 472-second runtime have not been
 independently measured.
@@ -62,6 +86,9 @@ loads for diagnosis and verify wiring; do not treat fuse or bootloader changes
 as routine troubleshooting.
 
 ## Battery power
+
+The confirmed hardware test used USB power at 5 V; battery operation was not
+part of that setup.
 
 Battery chemistry, voltage, connector polarity, protection, and whether power
 enters through VIN or the regulated rail are not specified. Determine all of
@@ -105,7 +132,7 @@ same conditions after their final LED shutdown.
 ## Known hardware limitations and pending checks
 
 - Exact Digispark/clone model and schematic revision are unconfirmed.
-- External resistor values and LED currents are unrecorded.
+- External LED models and actual LED currents are unrecorded.
 - Battery chemistry, voltage range, polarity, and protection are unrecorded.
 - P1 polarity is verified only on the user's current board.
 - P4 worked during the reported upload tests, but compatibility with other
